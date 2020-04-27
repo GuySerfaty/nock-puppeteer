@@ -1,0 +1,23 @@
+<html>
+  <head>
+  </head>
+  <body>
+    <h1>Product list</h1>
+
+    <script>
+      (async () => {
+        const results = await fetch('https://example.com/api/api/products');
+        const products = await results.json();
+        console.log('results', products);
+        const Container = document.createElement('div')
+        products.forEach((product) => {
+          const Product = document.createElement('div')
+          Product.innerHTML = product.product;
+          Product.classList.add('product-row');
+          Container.appendChild(Product);
+        })
+        document.body.appendChild(Container)
+      })();
+    </script>
+  </body>
+</html>

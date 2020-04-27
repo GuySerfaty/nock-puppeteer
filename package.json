@@ -7,7 +7,7 @@
     "lib/**/*"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --config jestconfig.json",
     "build": "tsc",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
     "lint": "tslint -p tsconfig.json"
@@ -16,8 +16,12 @@
     "nock": "^12.0.3",
     "puppeteer": "^3.0.1"
   },
-  "author": "",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GuySerfaty/nock-puppeteer.git"
+  },
+  "author": "GuySerfaty",
+  "license": "MIT",
   "devDependencies": {
     "@types/node": "^13.13.4",
     "@types/puppeteer": "^2.0.1",

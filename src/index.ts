@@ -1,4 +1,3 @@
-import * as nock from 'nock';
 import * as http from 'http';
 import * as https from 'https';
 
@@ -51,5 +50,4 @@ const getRequestHandler = (allowedHosts: string[]) => (interceptedRequest: any) 
 export default async (page: any, allowedHosts: string[]) => {
   await page.setRequestInterception(true);
   page.on('request', getRequestHandler(allowedHosts));
-  return nock
 }
