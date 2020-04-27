@@ -1,8 +1,9 @@
 {
   "name": "nock-puppeteer",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "",
-  "main": "index.js",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "files": [
     "lib/**/*"
   ],
@@ -11,10 +12,6 @@
     "build": "tsc",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
     "lint": "tslint -p tsconfig.json"
-  },
-  "dependencies": {
-    "nock": "^12.0.3",
-    "puppeteer": "^3.0.1"
   },
   "repository": {
     "type": "git",
@@ -25,7 +22,9 @@
   "devDependencies": {
     "@types/node": "^13.13.4",
     "@types/puppeteer": "^2.0.1",
+    "nock": "^12.0.3",
     "prettier": "^2.0.5",
+    "puppeteer": "^3.0.1",
     "tslint": "^6.1.2",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "^3.8.3"

@@ -47,7 +47,7 @@ const getRequestHandler = (allowedHosts: string[]) => (interceptedRequest: any) 
   })
 };
 
-export default async (page: any, allowedHosts: string[]) => {
+module.exports = async (page: any, allowedHosts: string[]) => {
   await page.setRequestInterception(true);
   page.on('request', getRequestHandler(allowedHosts));
 }
