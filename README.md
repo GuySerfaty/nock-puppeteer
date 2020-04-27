@@ -10,16 +10,24 @@ nock-puppeteer simply execute the requests instead of the browser with the help 
 
 
 ## Basic Usage
+ ```
 const puppeteer = require('puppeteer');
- 
+const nock = require('nock');
+const useNock = require('nock-puppeteer');
+
 (async () => {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
+  useNock(page, ['https://example.com/api'])
+  
+  const getProducts = await nock('https://example.com/api')
+    .get('/api/products')
+    .reply(200, [{id: 1, product: 'A'}, {id: 2, product: 'B'}]);
+
   await page.goto('https://example.com');
   await page.screenshot({path: 'example.png'});
- 
   await browser.close();
 })();
-
+```
 
 ## Basic Usage
