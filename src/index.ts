@@ -3,7 +3,7 @@ import * as https from 'https';
 
 const getRequestHandler = (allowedHosts: string[]) => (interceptedRequest: any) => {
   const url: string = interceptedRequest.url()
-  const supportedResourceType = ['xhr', 'fetch'];
+  const supportedResourceType = ['xhr', 'fetch', 'document'];
   if (!supportedResourceType.includes(interceptedRequest.resourceType()) || !allowedHosts.find(allowedHost => url.includes(allowedHost))) {
     return interceptedRequest.continue();
   }
