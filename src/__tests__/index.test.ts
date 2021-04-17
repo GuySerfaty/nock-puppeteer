@@ -43,7 +43,7 @@ test('Basic Mock', async () => {
   await browser.close();
 });
 
-it('Redirect Mock', async done => {
+test('Redirect Mock', async done => {
   const mockPage = `file:${path.join(__dirname, 'test.html')}`
   const browser = await puppeteer.launch({ headless: false });
   const page = await browser.newPage();
@@ -51,18 +51,18 @@ it('Redirect Mock', async done => {
 
   const redirectScope = nock('https://example.com')
     .get('/login')
-    .reply(301, { 'Location': 'https://some-auth-provider.com' });
+    .reply(301, undefined, { 'Location': 'https://some-auth-provider.com/authorize' });
 
-//  const authScope = nock('https://some-auth-provider.com')
-//    .get('/authorize')
-//    .reply(200, {});
+  const authScope = nock('https://some-auth-provider.com')
+    .get('/authorize')
+    .reply(200, {});
 
   await page.goto(mockPage);
 
   await page.click('#login');
 
   expect(redirectScope.isDone()).toBe(true);;
-//  expect(authScope.isDone()).toBe(true);;
+  expect(authScope.isDone()).toBe(true);;
   await browser.close();
   done();
 
