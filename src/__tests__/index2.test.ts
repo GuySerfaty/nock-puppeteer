@@ -12,7 +12,7 @@ const getSelectorText = async (page: any, selector: string) => {
 }
 
 test('Basic Mock', async () => {
-  console.log('Test 0 run')
+  console.log('Test 00 run')
   const mockPage = `file:${path.join(__dirname, 'test.html')}`
   const browser = await puppeteer.launch({ headless: false });
   const page = await browser.newPage();
@@ -38,7 +38,7 @@ test('Basic Mock', async () => {
 });
 
 test('Basic Mock2', async () => {
-  console.log('Test 2 run')
+  console.log('Test 02 run')
   const mockPage = `file:${path.join(__dirname, 'test.html')}`
   const browser = await puppeteer.launch({ headless: false });
   const page = await browser.newPage();
@@ -57,7 +57,7 @@ test('Basic Mock2', async () => {
 });
 
 test('Basic Mock3', async () => {
-  console.log('Test 3 run')
+  console.log('Test 03 run')
   const mockPage = `file:${path.join(__dirname, 'test.html')}`
   const browser = await puppeteer.launch({ headless: false });
   const page = await browser.newPage();
@@ -74,4 +74,3 @@ test('Basic Mock3', async () => {
   expect(firstText).toBe(mockProducts[0].product)
   await browser.close();
 });
-
