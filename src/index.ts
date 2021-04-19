@@ -54,7 +54,9 @@ const getRequestHandler = (allowedHosts: string[]) => (interceptedRequest: any) 
     });
 };
 
-export default async (page: any, allowedHosts: string[]) => {
+const useNock = async function(page: any, allowedHosts: string[]) {
   await page.setRequestInterception(true);
   page.on('request', getRequestHandler(allowedHosts));
 };
+
+module.exports = useNock;
