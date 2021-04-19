@@ -11,59 +11,65 @@ const getSelectorText = async (page: any, selector: string) => {
   return page.evaluate((pageElement: any) => pageElement.innerText, element);
 }
 
-test('Basic Mock', async () => {
-  const mockPage = `file:${path.join(__dirname, 'test.html')}`
-  const browser = await puppeteer.launch({ headless: false });
-  const page = await browser.newPage();
-  useNock(page, ['https://example.com/api'])
+describe('mocking', () => {
 
-  const mockProducts = [{id: 1, product: 'A'}, {id: 2, product: 'B'}];
-  await nock('https://example.com/api')
-    .get('/api/products')
-    .reply(200, mockProducts);
+  const mockPage = `file:${path.join(__dirname, 'test.html')}`;
 
-  await page.goto(mockPage);
-  await page.waitForSelector('#get-products');
-  await page.click('#get-products');
+  let browser:any, page:any;
 
-  const firstText = await getSelectorText(page, '.product-row')
-  expect(firstText).toBe(mockProducts[0].product)
+  beforeEach(async () => {
+    browser = await puppeteer.launch({ headless: false });
+    page = await browser.newPage();
+  });
 
-  await nock('https://example.com/api')
-    .get('/api/products')
-    .reply(200, [mockProducts[1]]);
+  afterEach(async () => {
+    browser = await browser.close();
+  });
 
-  await page.goto(mockPage);
-  await page.waitForSelector('#get-products');
-  await page.click('#get-products');
+  it('intercepts fetch requests', async () => {
+    useNock(page, ['https://example.com/api'])
 
-  const secondText = await getSelectorText(page, '.product-row')
-  expect(secondText).toBe(mockProducts[1].product)
+    const mockProducts = [{id: 1, product: 'A'}, {id: 2, product: 'B'}];
+    await nock('https://example.com/api')
+      .get('/api/products')
+      .reply(200, mockProducts);
 
-  await browser.close();
-});
+    await page.goto(mockPage);
+    await page.waitForSelector('#get-products');
+    await page.click('#get-products');
 
-test('Redirect Mock', async done => {
-  const mockPage = `file:${path.join(__dirname, 'test.html')}`
-  const browser = await puppeteer.launch({ headless: false });
-  const page = await browser.newPage();
-  useNock(page, ['https://example.com', 'https://some-auth-provider.com/authorize'])
+    const firstText = await getSelectorText(page, '.product-row')
+    expect(firstText).toBe(mockProducts[0].product)
 
-  const redirectScope = nock('https://example.com')
-    .get('/login')
-    .reply(301, undefined, { 'Location': 'https://some-auth-provider.com/authorize' });
+    await nock('https://example.com/api')
+      .get('/api/products')
+      .reply(200, [mockProducts[1]]);
 
-  const authScope = nock('https://some-auth-provider.com')
-    .get('/authorize')
-    .reply(200, {});
+    await page.goto(mockPage);
+    await page.waitForSelector('#get-products');
+    await page.click('#get-products');
 
-  await page.goto(mockPage);
+    const secondText = await getSelectorText(page, '.product-row')
+    expect(secondText).toBe(mockProducts[1].product)
+  });
 
-  await page.click('#login');
+  it('allows browser redirects', async () => {
+    useNock(page, ['https://example.com', 'https://some-auth-provider.com/authorize'])
 
-  expect(redirectScope.isDone()).toBe(true);;
-  expect(authScope.isDone()).toBe(true);;
-  await browser.close();
-  done();
+    const redirectScope = nock('https://example.com')
+      .get('/login')
+      .reply(301, undefined, { 'Location': 'https://some-auth-provider.com/authorize' });
 
+    const authScope = nock('https://some-auth-provider.com')
+      .get('/authorize')
+      .reply(200, {});
+
+    await page.goto(mockPage);
+
+    await page.click('#login');
+
+    expect(redirectScope.isDone()).toBe(true);;
+    expect(authScope.isDone()).toBe(true);;
+    expect(page.url()).toEqual('https://some-auth-provider.com/authorize');
+  });
 });
