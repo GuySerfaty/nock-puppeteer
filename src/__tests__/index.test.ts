@@ -2,7 +2,7 @@ import * as puppeteer from 'puppeteer';
 import { Page, Browser } from 'puppeteer';
 import * as nock from 'nock';
 import { MOCK_PAGE_PATH, DEFAULT_PP_CONFIG } from './const';
-import useNock from '../';
+const useNock = require('../');
 
 // const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 const getSelectorText = async (page: any, selector: string) => {
