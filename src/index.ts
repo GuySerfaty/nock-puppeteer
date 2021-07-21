@@ -1,22 +1,28 @@
 import * as http from 'http';
 import * as https from 'https';
+import { Page, Request, RespondOptions, Headers, ResourceType } from 'puppeteer';
 
-const getRequestHandler = (allowedHosts: string[]) => (interceptedRequest: any) => {
+const isUtf8Representable = function(buffer: Buffer) {
+  const utfEncodedBuffer = buffer.toString('utf8')
+  const reconstructedBuffer = Buffer.from(utfEncodedBuffer, 'utf8')
+  return reconstructedBuffer.equals(buffer)
+}
+
+const getRequestHandler = (allowedHosts: string[], supportedResourceTypes = ['xhr', 'fetch', 'document']) => (interceptedRequest: Request) => {
   const url: string = interceptedRequest.url();
-  const supportedResourceType = ['xhr', 'fetch', 'document'];
   if (
-    !supportedResourceType.includes(interceptedRequest.resourceType()) ||
+    !supportedResourceTypes.includes(interceptedRequest.resourceType()) ||
     !allowedHosts.find((allowedHost) => url.includes(allowedHost))
   ) {
     return interceptedRequest.continue();
   }
-  new Promise((resolve, reject) => {
+  new Promise<RespondOptions>((resolve, reject) => {
     let protocol: any = http;
     if (url.includes('https://')) {
       protocol = https;
     }
     const req: http.ClientRequest = protocol.request(url, {
-      method: interceptedRequest._method.toLowerCase(),
+      method: interceptedRequest.method().toLowerCase(),
       headers: interceptedRequest.headers(),
     });
     req.on('error', (e) => {
@@ -24,15 +30,24 @@ const getRequestHandler = (allowedHosts: string[]) => (interceptedRequest: any) 
     });
 
     req.on('response', (response) => {
-      let data = '';
+      const chunks: Uint8Array[] = [];
       response.on('data', (chunk) => {
-        data += chunk;
+        chunks.push(chunk);
       });
       response.on('end', () => {
+        var mergedBuffer = Buffer.concat(chunks);
+        var isBinary = !isUtf8Representable(mergedBuffer);
+        var data = null;
+        if (!isBinary) {
+          data = mergedBuffer.toString('utf8');
+        } else {
+          data = mergedBuffer;
+        }
+
         const resolveValue = {
           body: data,
           status: response.statusCode,
-          headers: response.headers,
+          headers: response.headers as Headers,
         };
         resolve(resolveValue);
       });
@@ -54,7 +69,7 @@ const getRequestHandler = (allowedHosts: string[]) => (interceptedRequest: any) 
     });
 };
 
-module.exports = async (page: any, allowedHosts: string[]) => {
+module.exports = async (page: Page, allowedHosts: string[], supportedResourceTypes?: ResourceType[]) => {
   await page.setRequestInterception(true);
-  page.on('request', getRequestHandler(allowedHosts));
+  page.on('request', getRequestHandler(allowedHosts, supportedResourceTypes));
 };
