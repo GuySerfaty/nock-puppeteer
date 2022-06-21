@@ -1,6 +1,6 @@
 import * as http from 'http';
 import * as https from 'https';
-import { Page, Request, RespondOptions, Headers, ResourceType } from 'puppeteer';
+import { Page, HTTPRequest, ResourceType, ResponseForRequest } from 'puppeteer';
 
 const isUtf8Representable = function(buffer: Buffer) {
   const utfEncodedBuffer = buffer.toString('utf8')
@@ -8,7 +8,7 @@ const isUtf8Representable = function(buffer: Buffer) {
   return reconstructedBuffer.equals(buffer)
 }
 
-const getRequestHandler = (allowedHosts: string[], supportedResourceTypes = ['xhr', 'fetch', 'document']) => (interceptedRequest: Request) => {
+const getRequestHandler = (allowedHosts: string[], supportedResourceTypes = ['xhr', 'fetch', 'document']) => (interceptedRequest: HTTPRequest) => {
   const url: string = interceptedRequest.url();
   if (
     !supportedResourceTypes.includes(interceptedRequest.resourceType()) ||
@@ -16,7 +16,7 @@ const getRequestHandler = (allowedHosts: string[], supportedResourceTypes = ['xh
   ) {
     return interceptedRequest.continue();
   }
-  new Promise<RespondOptions>((resolve, reject) => {
+  new Promise<Partial<ResponseForRequest>>((resolve, reject) => {
     let protocol: any = http;
     if (url.includes('https://')) {
       protocol = https;
@@ -47,7 +47,7 @@ const getRequestHandler = (allowedHosts: string[], supportedResourceTypes = ['xh
         const resolveValue = {
           body: data,
           status: response.statusCode,
-          headers: response.headers as Headers,
+          headers: response.headers as Record<string, string>,
         };
         resolve(resolveValue);
       });
