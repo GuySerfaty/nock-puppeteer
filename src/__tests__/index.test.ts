@@ -2,7 +2,6 @@ import * as puppeteer from 'puppeteer';
 import { Page, Browser } from 'puppeteer';
 import * as nock from 'nock';
 import { MOCK_PAGE_PATH, DEFAULT_PP_CONFIG } from './const';
-// jest.useFakeTimers()
 const useNock = require('../');
 
 // const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
