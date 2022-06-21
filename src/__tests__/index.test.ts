@@ -21,7 +21,7 @@ describe('Basic functionality', () => {
   });
 
   afterEach(async () => {
-    browser.close();
+    await browser.close();
   });
 
   it('intercepts fetch requests', async () => {
